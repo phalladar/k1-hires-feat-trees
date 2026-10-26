@@ -1,16 +1,15 @@
 # Publishing checklist
 
-1. Retake `docs/after.png` with the icon-stretch fix in, then run `python build.py`.
-2. **DeadlyStream** (primary): Downloads → Knights of the Old Republic → Mods (https://deadlystream.com/files/category/6-mods/).
+1. **DeadlyStream** (primary): Downloads → Knights of the Old Republic → Mods (https://deadlystream.com/files/category/6-mods/).
    Upload `dist/K1-HiRes-Feat-Trees-1.0.0.zip` and both screenshots, then paste the page text below.
    DeadlyStream files get a forum topic automatically. Link it from the comments on the KotOR High
    Resolution Menus file page, because that page is where the affected players are.
-3. **Nexus Mods** (mirror): Knights of the Old Republic → Add mod → category *User Interface*. Same zip,
+2. **Nexus Mods** (mirror): Knights of the Old Republic → Add mod → category *User Interface*. Same zip,
    screenshots and text. Set requirements to UniWS, KotOR High Resolution Menus and (for Steam) the KOTOR
    Editable Executable.
-4. **GitHub** (source): make this repo public, attach the zip to a `v1.0.0` release, and link the repo from
+3. **GitHub** (source): make this repo public, attach the zip to a `v1.0.0` release, and link the repo from
    both mod pages.
-5. **Word of mouth**: post on r/kotor with the before/after pair, mention it in the KOTOR modding Discord's
+4. **Word of mouth**: post on r/kotor with the before/after pair, mention it in the KOTOR modding Discord's
    mod-release channel, and ask the kotor.neocities.org build guide maintainers to consider it for the K1 Full
    build alongside High Resolution Menus.
 
