@@ -1,0 +1,35 @@
+K1 High-Res Feat & Power Trees - what the patcher writes
+=======================================================
+
+Target: swkotor.exe as the KOTOR Editable Executable / GOG 1.03, after UniWS and KotOR High
+Resolution Menus. For these .text addresses FILE = VA - 0x400000. K1 Area Map Fixes grows the exe
+by 8 KB at the end of .rsrc; that doesn't move any of these offsets.
+
+THE ENGINE CODE
+---------------
+Feat tree row      VA 0x6CD7E0 builds one row (3 feat icons + 2 arrows), then calls the row's
+                   SetExtent with a hardcoded rect {0, 0, 242, 40}. The listbox later stretches
+                   the width to its own; the height is never revisited.
+Power tree row     VA 0x6CDA80, the same for Force powers.
+Row SetExtent      VA 0x6CCE30 (vtable 0x7578A8 + 4). Icons are row-height squares at left, centre
+                   and right. Arrows are a fixed 32x32, centred vertically with (h - 32) / 2 and
+                   horizontally between the icons with a -16 offset.
+
+WHAT IS WRITTEN (k = menu height / 480; row = round(40k); arrow = min(128, round(32k)), even)
+------------------------------------------------------------------------------------------
+FILE      VA        instruction                       vanilla   new
+0x2CD8D9  0x6CD8D9  mov dword [esp+0x24], imm32        40        row      feat row height
+0x2CDB79  0x6CDB79  mov dword [esp+0x24], imm32        40        row      power row height
+0x2CCE5F  0x6CCE5F  mov eax, imm32                     32        arrow    arrow width/height
+0x2CCF08  0x6CCF08  lea eax, [ecx+disp8]              -32       -arrow    arrow vertical centring
+0x2CCF2A  0x6CCF2A  lea edx, [eax+ecx+disp8]          -16       -arrow/2  arrow 1 horizontal
+0x2CCF5C  0x6CCF5C  lea edx, [eax+ecx+disp8]          -16       -arrow/2  arrow 2 horizontal
+
+The arrow offsets are signed bytes, hence the 128 px cap (reached at menu height 1920).
+
+Before writing, the bytes preceding each operand are checked (C7442424 / B8 / 8D41 / 8D5408) and the
+current values must be either vanilla or a consistent earlier install. Menu height is read from High
+Resolution Menus' canvas constants: -int32 at FILE 0xB6DA and 0xBA83, int32 at 0xAA85 (all three must
+agree). The written file is re-read and compared byte for byte.
+
+Uninstall writes the vanilla values back.
