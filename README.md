@@ -13,7 +13,7 @@ icon pictures stretch to fill them.
 |---|---|
 | ![before](docs/before.png) | ![after](docs/after.png) |
 
-**Download:** [DeadlyStream](https://deadlystream.com/files/file/3161-k1-high-res-feat-power-trees/) · [Nexus Mods](https://www.nexusmods.com/kotor/mods/1906) · [GitHub release](https://github.com/phalladar/k1-hires-feat-trees/releases/latest). Requires the KOTOR
+**Download:** [DeadlyStream](https://deadlystream.com/files/file/3161-k1-high-res-feat-power-trees/) | [Nexus Mods](https://www.nexusmods.com/kotor/mods/1906) | [GitHub release](https://github.com/phalladar/k1-hires-feat-trees/releases/latest). Requires the KOTOR
 Editable Executable (Steam only), UniWS and KotOR High Resolution Menus.
 
 - `mod/` is exactly what ships: `Install.bat`, `Uninstall.bat`, `K1FeatTrees.ps1` (Windows PowerShell 5.1,
