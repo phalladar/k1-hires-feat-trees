@@ -25,11 +25,13 @@ EXES = {
 }
 ROW = (0x2CD8D9, 0x2CDB79)
 ARROW, ARROW_NEG, ARROW_HALF = 0x2CCE5F, 0x2CCF08, (0x2CCF2A, 0x2CCF5C)
+NATIVE = (0x2CCD7F, 0x2CCDC2)    # push 1/0: draw icon/arrow pictures at native size
 
 
 def values(data):
     return ([struct.unpack_from("<i", data, o)[0] for o in ROW], struct.unpack_from("<i", data, ARROW)[0],
-            struct.unpack_from("<b", data, ARROW_NEG)[0], [struct.unpack_from("<b", data, o)[0] for o in ARROW_HALF])
+            struct.unpack_from("<b", data, ARROW_NEG)[0], [struct.unpack_from("<b", data, o)[0] for o in ARROW_HALF],
+            [data[o] for o in NATIVE])
 
 
 class PatcherTest(unittest.TestCase):
@@ -60,18 +62,18 @@ class PatcherTest(unittest.TestCase):
         self.assertEqual(code, 0, out)
         (g / "swkotor.exe.before-feat-trees.bak").unlink(missing_ok=True)
         before = (g / "swkotor.exe").read_bytes()
-        self.assertEqual(values(before), ([40, 40], 32, -32, [-16, -16]))
+        self.assertEqual(values(before), ([40, 40], 32, -32, [-16, -16], [1, 1]))
         code, out = self.run_ps(g)
         self.assertEqual(code, 0, out)
         after = (g / "swkotor.exe").read_bytes()
         h = -struct.unpack_from("<i", before, 0xB6DA)[0]
         row, arrow = round(40 * h / 480), min(128, round(32 * h / 480)) // 2 * 2
-        self.assertEqual(values(after), ([row, row], arrow, -arrow, [-arrow // 2] * 2), out)
+        self.assertEqual(values(after), ([row, row], arrow, -arrow, [-arrow // 2] * 2, [0, 0]), out)
         changed = [i for i in range(len(before)) if before[i] != after[i]]
         allowed = set()
         for o in ROW + (ARROW,):
             allowed.update(range(o, o + 4))
-        allowed.update((ARROW_NEG,) + ARROW_HALF)
+        allowed.update((ARROW_NEG,) + ARROW_HALF + NATIVE)
         self.assertTrue(set(changed) <= allowed, [hex(i) for i in changed])
         self.assertTrue((g / "swkotor.exe.before-feat-trees.bak").read_bytes() == before)
         code, out = self.run_ps(g)
@@ -85,10 +87,10 @@ class PatcherTest(unittest.TestCase):
         g = self.game("base")
         code, out = self.run_ps(g, "-Height", "1440")
         self.assertEqual(code, 0, out)
-        self.assertEqual(values((g / "swkotor.exe").read_bytes()), ([120, 120], 96, -96, [-48, -48]))
+        self.assertEqual(values((g / "swkotor.exe").read_bytes()), ([120, 120], 96, -96, [-48, -48], [0, 0]))
         code, out = self.run_ps(g, "-Height", "1080")      # re-run at another resolution
         self.assertEqual(code, 0, out)
-        self.assertEqual(values((g / "swkotor.exe").read_bytes()), ([90, 90], 72, -72, [-36, -36]))
+        self.assertEqual(values((g / "swkotor.exe").read_bytes()), ([90, 90], 72, -72, [-36, -36], [0, 0]))
 
     def test_base_exe_without_hr_menus_is_refused(self):
         g = self.game("base")

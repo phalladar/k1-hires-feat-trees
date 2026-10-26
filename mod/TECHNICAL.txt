@@ -24,12 +24,20 @@ FILE      VA        instruction                       vanilla   new
 0x2CCF08  0x6CCF08  lea eax, [ecx+disp8]              -32       -arrow    arrow vertical centring
 0x2CCF2A  0x6CCF2A  lea edx, [eax+ecx+disp8]          -16       -arrow/2  arrow 1 horizontal
 0x2CCF5C  0x6CCF5C  lea edx, [eax+ecx+disp8]          -16       -arrow/2  arrow 2 horizontal
+0x2CCD7F  0x6CCD7F  push imm8 (before call 0x4159C0)   1         0         icons: stretch, not native
+0x2CCDC2  0x6CCDC2  push imm8 (before call 0x4159C0)   1         0         arrows: stretch, not native
 
 The arrow offsets are signed bytes, hence the 128 px cap (reached at menu height 1920).
 
-Before writing, the bytes preceding each operand are checked (C7442424 / B8 / 8D41 / 8D5408) and the
+Before writing, the bytes preceding each operand are checked (C7442424 / B8 / 8D41 / 8D5408 / 6A) and the
 current values must be either vanilla or a consistent earlier install. Menu height is read from High
 Resolution Menus' canvas constants: -int32 at FILE 0xB6DA and 0xBA83, int32 at 0xAA85 (all three must
 agree). The written file is re-read and compared byte for byte.
+
+The row constructor (VA 0x6CCCC0) sets each icon and arrow picture to draw at its texture's native
+size (0x4159C0 sets flag bit 1; the picture's SetExtent at 0x415B70 then sizes it to the 32x32
+texture instead of the rect). Clearing the argument makes them fill their rect: icons fill the
+button's inner area and arrows fill their arrow-sized box. At 640x480 those boxes are about the
+texture's own size, so this mainly matters at high resolutions.
 
 Uninstall writes the vanilla values back.

@@ -6,13 +6,15 @@ engine hardcodes for 640x480: every tree row is 40 px tall (icons are row-height
 arrows between icons are 32 px. KotOR High Resolution Menus rescales the .gui files, but these
 sizes are not read from any .gui (LB_FEATS' PROTOITEM is ignored), so the icons stay tiny.
 
-This script rescales the six hardcoded values in swkotor.exe by (menu height / 480), the same
-factor High Resolution Menus applies to everything else, so the trees keep vanilla proportions.
+This script rescales the six hardcoded sizes in swkotor.exe by (menu height / 480), the same
+factor High Resolution Menus applies to everything else, and makes the icon and arrow pictures
+stretch to fill them (the engine draws them at their native 32 px otherwise). The trees keep their
+vanilla proportions.
 
     K1FeatTrees.ps1 [-GameDir <folder>] [-Height <menu height>] [-Uninstall] [-DryRun]
 
 -Height overrides the menu height that is otherwise read from High Resolution Menus' constants
-in the exe. -Uninstall writes the six original values back. Nothing else in the file is touched.
+in the exe. -Uninstall writes the eight original values back. Nothing else in the file is touched.
 #>
 [CmdletBinding()]
 param(
@@ -33,7 +35,9 @@ $Sites = @(
     @{ Off = 0x2CCE5F; Prefix = 'B8';       Size = 4; Vanilla = 32;  Kind = 'arrow';    What = 'arrow size (mov eax, 32)' },
     @{ Off = 0x2CCF08; Prefix = '8D41';     Size = 1; Vanilla = -32; Kind = '-arrow';   What = 'arrow vertical centring (lea eax, [ecx-32])' },
     @{ Off = 0x2CCF2A; Prefix = '8D5408';   Size = 1; Vanilla = -16; Kind = '-arrow/2'; What = 'first arrow horizontal centring (lea edx, [eax+ecx-16])' },
-    @{ Off = 0x2CCF5C; Prefix = '8D5408';   Size = 1; Vanilla = -16; Kind = '-arrow/2'; What = 'second arrow horizontal centring (lea edx, [eax+ecx-16])' }
+    @{ Off = 0x2CCF5C; Prefix = '8D5408';   Size = 1; Vanilla = -16; Kind = '-arrow/2'; What = 'second arrow horizontal centring (lea edx, [eax+ecx-16])' },
+    @{ Off = 0x2CCD7F; Prefix = '6A';       Size = 1; Vanilla = 1;   Kind = 'native';   What = 'icons drawn at native 32 px, not stretched (push 1 -> SetNativeSize)' },
+    @{ Off = 0x2CCDC2; Prefix = '6A';       Size = 1; Vanilla = 1;   Kind = 'native';   What = 'arrows drawn at native size, not stretched (push 1 -> SetNativeSize)' }
 )
 # KotOR High Resolution Menus writes the menu size into these int32 operands (negated for the first
 # pair). Same offsets K1 Area Map Fixes reads.
@@ -112,11 +116,11 @@ foreach ($s in $Sites) {
 
 $current = $Sites | ForEach-Object { Read-Value $data $_ }
 $rowNow, $arrowNow = $current[0], $current[2]
-if ($current[1] -ne $rowNow -or $current[3] -ne -$arrowNow -or $current[4] -ne [int](-$arrowNow / 2) -or $current[5] -ne $current[4] -or $rowNow -lt 16 -or $rowNow -gt 1000) {
+if (($current[6] -ne 0 -and $current[6] -ne 1) -or $current[7] -ne $current[6] -or $current[1] -ne $rowNow -or $current[3] -ne -$arrowNow -or $current[4] -ne [int](-$arrowNow / 2) -or $current[5] -ne $current[4] -or $rowNow -lt 16 -or $rowNow -gt 1000) {
     Fail ("The values at the patch sites do not look like the original game or an earlier install of`n" +
           "this mod, so another patch may have changed them. Found: $($current -join ', ').")
 }
-$installed = $rowNow -ne 40
+$installed = $rowNow -ne 40 -or $current[6] -eq 0
 Write-Host ("  Now:         rows {0} px, arrows {1} px{2}" -f $rowNow, $arrowNow, $(if ($installed) { ' (this mod is installed)' } else { ' (original game values)' }))
 
 if ($Uninstall) {
@@ -144,9 +148,10 @@ if ($Uninstall) {
     $arrow -= $arrow % 2
 }
 
-$new = @{ 'row' = $row; 'arrow' = $arrow; '-arrow' = -$arrow; '-arrow/2' = [int](-$arrow / 2) }
+$native = [int][bool]$Uninstall
+$new = @{ 'row' = $row; 'arrow' = $arrow; '-arrow' = -$arrow; '-arrow/2' = [int](-$arrow / 2); 'native' = $native }
 Write-Host ("  Target:      rows {0} px, arrows {1} px" -f $row, $arrow)
-if ($row -eq $rowNow -and $arrow -eq $arrowNow) {
+if ($row -eq $rowNow -and $arrow -eq $arrowNow -and $native -eq $current[6]) {
     Write-Host ''
     Write-Host '  Nothing to do - already set to these sizes.' -ForegroundColor Green
     exit 0
