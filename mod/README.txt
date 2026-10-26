@@ -32,9 +32,9 @@ REQUIREMENTS (install in this order)
   3. KotOR High Resolution Menus  menus rebuilt for your resolution
   4. This mod
 
-It changes six values (at most 15 bytes) in swkotor.exe and nothing in Override, and doesn't change the exe's size. It's
-tested together with K1 Area Map Fixes and the 4 GB / LAA patch, in either order. It doesn't
-overlap K1 Ultrawide Letterbox Fix's published offsets, but that combination is untested.
+It changes six values (at most 15 bytes) in swkotor.exe and nothing in Override, and doesn't
+change the exe's size. Tested on an exe that already had K1 Area Map Fixes and the 4 GB / LAA
+patch installed. It doesn't overlap K1 Ultrawide Letterbox Fix's published offsets, but that combination is untested.
 
 INSTALL
 -------
