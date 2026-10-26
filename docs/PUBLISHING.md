@@ -36,4 +36,4 @@ Menus, then this.
 
 **Install:** double-click Install.bat. Run it again if you later change resolution.
 
-Source and byte-level documentation: (GitHub link)
+Source and byte-level documentation: https://github.com/phalladar/k1-hires-feat-trees

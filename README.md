@@ -6,7 +6,15 @@ feat and Force power selection icons with the rest of the
 
 The engine builds every feat and power tree row with a hardcoded 40 px height and 32 px arrows, and never
 reads these sizes from the `.gui` files. High Resolution Menus therefore can't enlarge them, and the icons stay
-640x480-sized at any resolution. This patcher rescales the six hardcoded values by `menu height / 480`.
+640x480-sized at any resolution. This patcher rescales the hardcoded sizes by `menu height / 480` and makes the
+icon pictures stretch to fill them.
+
+| Before | After |
+|---|---|
+| ![before](docs/before.png) | ![after](docs/after.png) |
+
+**Download:** [latest release](https://github.com/phalladar/k1-hires-feat-trees/releases/latest). Requires the KOTOR
+Editable Executable (Steam only), UniWS and KotOR High Resolution Menus.
 
 - `mod/` is exactly what ships: `Install.bat`, `Uninstall.bat`, `K1FeatTrees.ps1` (Windows PowerShell 5.1,
   no dependencies), `README.txt` and `TECHNICAL.txt` (the byte-level table).
